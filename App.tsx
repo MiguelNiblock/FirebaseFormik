@@ -1,9 +1,22 @@
-import React from 'react';
+import React,{useEffect} from 'react';
 import { Text, View, StyleSheet, TextInput, Alert } from 'react-native';
 import Constants from 'expo-constants';
 import { Button } from 'react-native-paper';
 import { Formik, FormikProps, ErrorMessage, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
+import firebase from "firebase";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA0U5_W8YpWxrYoyiSULGfTtijc2RPId6k",
+  authDomain: "fir-form-2496c.firebaseapp.com",
+  projectId: "fir-form-2496c",
+  storageBucket: "fir-form-2496c.appspot.com",
+  messagingSenderId: "373981403895",
+  appId: "1:373981403895:web:9e3419e85cf5cc8a8511f2"
+};
+const fbapp = firebase.initializeApp(firebaseConfig);
+const firestore = fbapp.firestore();
+const collection = firestore.collection('users');
 
 interface myFieldsType {
   name: string,
@@ -20,14 +33,27 @@ const validationSchema = Yup.object({
     .required('Required'),
 })
 
-const onSubmit = (values:myFieldsType, formikActions:FormikHelpers<myFieldsType>) => {
-  setTimeout(() => {
-    Alert.alert(JSON.stringify(values));
-    formikActions.setSubmitting(false);
-  }, 500);
-}
-
 export default ()=> {
+
+  useEffect(()=>{
+  fbapp.auth().signInAnonymously().then((cred) => {
+    console.log('Anonymous user:',cred.user)
+  }).catch((error) => {
+    console.error(error)
+  })
+  },[]);
+
+  const onSubmit = async (values:myFieldsType, formikActions:FormikHelpers<myFieldsType>) => {
+    console.log('Adding values:',values);
+    try {
+      const user = await collection.add(values);
+      const snapshot = await user.get();
+      console.log('Saved data:',snapshot.data());
+    } catch (error) {
+      console.error(error);
+    }
+    formikActions.setSubmitting(false);
+  }
 
   let emailInput: TextInput | null = null;
 
