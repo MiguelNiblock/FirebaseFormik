@@ -5,16 +5,9 @@ import { Button } from 'react-native-paper';
 import { Formik, FormikProps, ErrorMessage, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import firebase from "firebase";
+import fbconfig from "./fbconfig"
 
-const firebaseConfig = {
-  apiKey: "AIzaSyA0U5_W8YpWxrYoyiSULGfTtijc2RPId6k",
-  authDomain: "fir-form-2496c.firebaseapp.com",
-  projectId: "fir-form-2496c",
-  storageBucket: "fir-form-2496c.appspot.com",
-  messagingSenderId: "373981403895",
-  appId: "1:373981403895:web:9e3419e85cf5cc8a8511f2"
-};
-const fbapp = firebase.initializeApp(firebaseConfig);
+const fbapp = firebase.initializeApp(fbconfig);
 const firestore = fbapp.firestore();
 const collection = firestore.collection('users');
 
