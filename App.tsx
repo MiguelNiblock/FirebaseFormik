@@ -102,7 +102,7 @@ export default ()=> {
           color="black"
           mode="contained"
           loading={isSubmitting}
-          disabled={isSubmitting}
+          disabled={isSubmitting || Object.entries(errors).some(([k,v])=>v) || Object.entries(values).every(([k,v])=>!v)}
           style={{ marginTop: 16 }}>
           Submit
         </Button>
@@ -110,7 +110,7 @@ export default ()=> {
           onPress={handleReset}
           color="black"
           mode="outlined"
-          disabled={isSubmitting}
+          disabled={isSubmitting || Object.entries(values).every(([k,v])=>!v)}
           style={{ marginTop: 16 }}>
           Reset
         </Button></>
