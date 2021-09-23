@@ -102,7 +102,7 @@ export default ()=> {
           color="black"
           mode="contained"
           loading={isSubmitting}
-          disabled={isSubmitting || Object.entries(errors).some(([k,v])=>v) || Object.entries(values).every(([k,v])=>!v)}
+          disabled={isSubmitting || Object.entries(errors).some(([k,v])=>v) || Object.entries(values).some(([k,v])=>!v)}
           style={{ marginTop: 16 }}>
           Submit
         </Button>
