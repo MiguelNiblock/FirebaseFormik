@@ -16,14 +16,26 @@ interface myFieldsType {
   email: string
 }
 
-const initialValues = { name: '', email: '' }
+const initialValues: myFieldsType = { name: '', email: '' }
 
 const validationSchema = Yup.object({
   name: Yup.string()              
     .required('Required'),
   email: Yup.string()
     .email('Invalid Email')
-    .required('Required'),
+    .required('Required')
+    .test('checkDuplEmail', 'This email already exists', async(value,context)=> {
+      console.log('validating email async. value:',value);
+      return new Promise((resolve, reject) => {
+        collection.where('email','==',value||'').get().then(qSnap => {
+          console.log('email async validation:',qSnap?.docs[0]?.data());
+          if (!qSnap.empty){
+            resolve(context.createError({message:`Email ${value} already exists`}))
+          }
+          resolve(true)
+        })
+      })
+    })
 })
 
 export default ()=> {
@@ -39,7 +51,12 @@ export default ()=> {
   const onSubmit = async (values:myFieldsType, formikActions:FormikHelpers<myFieldsType>) => {
     console.log('Adding values:',values);
     try {
+      //check if email exists
+      // const qSnap = await collection.where('email','==',values.email).get();
+      // if (!qSnap.empty){ throw `Email ${values.email} already exists` }
+      //add user
       const user = await collection.add(values);
+      //retrieve user
       const snapshot = await user.get();
       console.log('Saved data:',snapshot.data());
     } catch (error) {
