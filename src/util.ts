@@ -9,18 +9,21 @@ export const collection = firestore.collection('users');
 
 export interface myFieldsType {
   name: string,
-  email: string
+  email: string,
+  form?: string,
 }
 
 export const onSubmit = async (values:myFieldsType, formikActions:FormikHelpers<myFieldsType>) => {
   // console.log('Adding values:',values);
   try {
+    // throw "Can't reach firebase"
     const user = await collection.add(values);
     //retrieve user
     // const snapshot = await user.get();
     // console.log('Saved data:',snapshot.data());
   } catch (err) {
-    console.error("Could not submit form:",err);
+    console.error("Could not submit form: "+err);
+    formikActions.setErrors({form:"Could not submit form: "+err})
   }
   formikActions.setSubmitting(false);
 }
@@ -31,6 +34,7 @@ export const emailAsyncValidation = async (value: string | undefined, context: Y
   return new Promise((resolve) => {
     value ?? resolve(false)
     collection.where('email','==',value).get().then(qSnap => {
+      // throw "Can't reach firebase"
       // console.log('Existing user:',qSnap?.docs[0]?.data());
       if (!qSnap.empty){
         resolve(context.createError({message:`Email ${value} already exists`}))

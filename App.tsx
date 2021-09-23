@@ -1,10 +1,10 @@
 import React,{useEffect} from 'react';
-import { Text, View, StyleSheet, TextInput, Alert } from 'react-native';
+import { Text, View, StyleSheet, TextInput } from 'react-native';
 import Constants from 'expo-constants';
 import { Button } from 'react-native-paper';
-import { Formik, FormikProps, ErrorMessage, FormikHelpers } from 'formik';
+import { Formik, FormikProps } from 'formik';
 import * as Yup from 'yup';
-import {myFieldsType,onSubmit,collection,fbapp,emailAsyncValidation} from './src/util'
+import {myFieldsType,onSubmit,fbapp,emailAsyncValidation} from './src/util'
 
 const initialValues: myFieldsType = { name: '', email: '' }
 
@@ -22,6 +22,7 @@ export default () => {
   useEffect(()=>{
     fbapp.auth().signInAnonymously().then((cred) => {
     // console.log('Anonymous user:',cred.user)
+    // throw "Can't reach firebase"
   }).catch((err) => {
     console.error("Can't reach server while trying to sign in anonymously:",err)
   })
@@ -78,7 +79,11 @@ export default () => {
           disabled={isSubmitting || Object.entries(values).every(([k,v])=>!v)}
           style={{ marginTop: 16 }}>
           Reset
-        </Button></>
+        </Button>
+        {errors.form ? (
+          <Text style={styles.error}>{errors.form}</Text>
+        ) : null}
+        </>
       )}
     </Formik>
   </View>
