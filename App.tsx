@@ -25,10 +25,10 @@ const validationSchema = Yup.object({
     .email('Invalid Email')
     .required('Required')
     .test('checkDuplEmail', 'This email already exists', async(value,context)=> {
-      console.log('validating email async. value:',value);
+      // value && console.log('Validating email async. value:',value);
       return new Promise((resolve, reject) => {
         collection.where('email','==',value||'').get().then(qSnap => {
-          console.log('email async validation:',qSnap?.docs[0]?.data());
+          // console.log('Existing user:',qSnap?.docs[0]?.data());
           if (!qSnap.empty){
             resolve(context.createError({message:`Email ${value} already exists`}))
           }
@@ -42,23 +42,19 @@ export default ()=> {
 
   useEffect(()=>{
   fbapp.auth().signInAnonymously().then((cred) => {
-    console.log('Anonymous user:',cred.user)
+    // console.log('Anonymous user:',cred.user)
   }).catch((error) => {
     console.error(error)
   })
   },[]);
 
   const onSubmit = async (values:myFieldsType, formikActions:FormikHelpers<myFieldsType>) => {
-    console.log('Adding values:',values);
+    // console.log('Adding values:',values);
     try {
-      //check if email exists
-      // const qSnap = await collection.where('email','==',values.email).get();
-      // if (!qSnap.empty){ throw `Email ${values.email} already exists` }
-      //add user
       const user = await collection.add(values);
       //retrieve user
-      const snapshot = await user.get();
-      console.log('Saved data:',snapshot.data());
+      // const snapshot = await user.get();
+      // console.log('Saved data:',snapshot.data());
     } catch (error) {
       console.error(error);
     }
