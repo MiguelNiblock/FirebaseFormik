@@ -16,14 +16,13 @@ export interface myFieldsType {
 export const onSubmit = async (values:myFieldsType, formikActions:FormikHelpers<myFieldsType>) => {
   // console.log('Adding values:',values);
   try {
-    // throw "Can't reach firebase"
+    // throw "Can't reach firebase" // (test error handling)
     const user = await collection.add(values);
-    //retrieve user
-    // const snapshot = await user.get();
+    // const snapshot = await user.get(); // (Test retrieving user)
     // console.log('Saved data:',snapshot.data());
   } catch (err) {
     console.error("Could not submit form: "+err);
-    formikActions.setErrors({form:"Could not submit form: "+err})
+    formikActions.setErrors({form:"Could not submit form: "+err})// displays an error at bottom of form
   }
   formikActions.setSubmitting(false);
 }
@@ -34,7 +33,7 @@ export const emailAsyncValidation = async (value: string | undefined, context: Y
   return new Promise((resolve) => {
     value ?? resolve(false)
     collection.where('email','==',value).get().then(qSnap => {
-      // throw "Can't reach firebase"
+      // throw "Can't reach firebase" // (test error handling)
       // console.log('Existing user:',qSnap?.docs[0]?.data());
       if (!qSnap.empty){
         resolve(context.createError({message:`Email ${value} already exists`}))
@@ -43,7 +42,7 @@ export const emailAsyncValidation = async (value: string | undefined, context: Y
     })
     .catch((err)=>{
       console.error("Can't reach server while checking email duplication:",err)
-      resolve(context.createError({message:`Cannot validate email at this time`}))
+      resolve(context.createError({message:`Cannot validate email at this time`}))// Displays error message beneath email field
     })
   })
 }

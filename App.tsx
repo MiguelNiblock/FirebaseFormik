@@ -1,10 +1,10 @@
-import React,{useEffect} from 'react';
-import { Text, View, StyleSheet, TextInput } from 'react-native';
-import Constants from 'expo-constants';
-import { Button } from 'react-native-paper';
+import React from 'react';
+import { Text, View, StyleSheet } from 'react-native';
 import { Formik, FormikProps } from 'formik';
 import * as Yup from 'yup';
-import {myFieldsType,onSubmit,fbapp,emailAsyncValidation} from './src/util'
+import {myFieldsType,onSubmit,emailAsyncValidation} from './src/util';
+import MyForm from "./src/myForm";
+import Constants from 'expo-constants';
 
 const initialValues: myFieldsType = { name: '', email: '' }
 
@@ -19,17 +19,6 @@ const validationSchema = Yup.object({
 
 export default () => {
 
-  useEffect(()=>{
-    fbapp.auth().signInAnonymously().then((cred) => {
-    // console.log('Anonymous user:',cred.user)
-    // throw "Can't reach firebase"
-  }).catch((err) => {
-    console.error("Can't reach server while trying to sign in anonymously:",err)
-  })
-  },[]);
-
-  let emailInput: TextInput | null = null;
-
   return <View style={styles.container}>
     <Text style={styles.title}>Formik/Yup to Firebase</Text>
     <Formik
@@ -37,53 +26,10 @@ export default () => {
       validationSchema={validationSchema}
       onSubmit={onSubmit}
     >
-      { ({handleChange,handleBlur,handleSubmit,handleReset,isSubmitting,touched,errors,values} : FormikProps<myFieldsType> ) => ( <>
-        <TextInput
-          onChangeText={handleChange('name')}
-          onBlur={handleBlur('name')}
-          value={values.name}
-          autoFocus
-          placeholder="Your Name"
-          style={styles.input}
-          onSubmitEditing={() => {
-            emailInput?.focus()
-          }}
-        />
-        {touched.name && errors.name ? (
-          <Text style={styles.error}>{errors.name}</Text>
-        ) : null}
-        <TextInput
-          onChangeText={handleChange('email')}
-          onBlur={handleBlur('email')}
-          value={values.email}
-          placeholder="Email Address"
-          style={styles.input}
-          ref={el => emailInput = el}
-        />
-        {touched.email && errors.email ? (
-          <Text style={styles.error}>{errors.email}</Text>
-        ) : null}
-        <Button
-          onPress={handleSubmit}
-          color="black"
-          mode="contained"
-          loading={isSubmitting}
-          disabled={isSubmitting || Object.entries(errors).some(([k,v])=>v) || Object.entries(values).some(([k,v])=>!v)}
-          style={{ marginTop: 16 }}>
-          Submit
-        </Button>
-        <Button
-          onPress={handleReset}
-          color="black"
-          mode="outlined"
-          disabled={isSubmitting || Object.entries(values).every(([k,v])=>!v)}
-          style={{ marginTop: 16 }}>
-          Reset
-        </Button>
-        {errors.form ? (
-          <Text style={styles.error}>{errors.form}</Text>
-        ) : null}
-        </>
+      { (props : FormikProps<myFieldsType> ) => (
+
+        <MyForm {...props} />
+      
       )}
     </Formik>
   </View>
