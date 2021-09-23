@@ -4,17 +4,7 @@ import Constants from 'expo-constants';
 import { Button } from 'react-native-paper';
 import { Formik, FormikProps, ErrorMessage, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
-import firebase from "firebase";
-import fbconfig from "./fbconfig"
-
-const fbapp = firebase.initializeApp(fbconfig);
-const firestore = fbapp.firestore();
-const collection = firestore.collection('users');
-
-interface myFieldsType {
-  name: string,
-  email: string
-}
+import {myFieldsType,onSubmit,collection,fbapp,emailAsyncValidation} from './src/util'
 
 const initialValues: myFieldsType = { name: '', email: '' }
 
@@ -24,43 +14,18 @@ const validationSchema = Yup.object({
   email: Yup.string()
     .email('Invalid Email')
     .required('Required')
-    .test('checkDuplEmail', 'This email already exists', async(value,context)=> {
-      // value && console.log('Validating email async. value:',value);
-      return new Promise((resolve) => {
-        value ?? resolve(false)
-        collection.where('email','==',value).get().then(qSnap => {
-          // console.log('Existing user:',qSnap?.docs[0]?.data());
-          if (!qSnap.empty){
-            resolve(context.createError({message:`Email ${value} already exists`}))
-          }
-          resolve(true)
-        })
-      })
-    })
+    .test('checkDuplEmail', 'This email already exists', emailAsyncValidation)
 })
 
-export default ()=> {
+export default () => {
 
   useEffect(()=>{
-  fbapp.auth().signInAnonymously().then((cred) => {
+    fbapp.auth().signInAnonymously().then((cred) => {
     // console.log('Anonymous user:',cred.user)
-  }).catch((error) => {
-    console.error(error)
+  }).catch((err) => {
+    console.error("Can't reach server while trying to sign in anonymously:",err)
   })
   },[]);
-
-  const onSubmit = async (values:myFieldsType, formikActions:FormikHelpers<myFieldsType>) => {
-    // console.log('Adding values:',values);
-    try {
-      const user = await collection.add(values);
-      //retrieve user
-      // const snapshot = await user.get();
-      // console.log('Saved data:',snapshot.data());
-    } catch (error) {
-      console.error(error);
-    }
-    formikActions.setSubmitting(false);
-  }
 
   let emailInput: TextInput | null = null;
 
