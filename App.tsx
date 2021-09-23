@@ -26,8 +26,9 @@ const validationSchema = Yup.object({
     .required('Required')
     .test('checkDuplEmail', 'This email already exists', async(value,context)=> {
       // value && console.log('Validating email async. value:',value);
-      return new Promise((resolve, reject) => {
-        collection.where('email','==',value||'').get().then(qSnap => {
+      return new Promise((resolve) => {
+        value ?? resolve(false)
+        collection.where('email','==',value).get().then(qSnap => {
           // console.log('Existing user:',qSnap?.docs[0]?.data());
           if (!qSnap.empty){
             resolve(context.createError({message:`Email ${value} already exists`}))
